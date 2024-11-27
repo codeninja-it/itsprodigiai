@@ -1,0 +1,47 @@
+@import url(opzioni.css);
+		
+body {
+	background-color: var(--sfondo);
+	font-family: Arial, Verdana, Courier;
+	margin: 0;
+	padding: 0;
+}
+
+div {
+	border: 1 px solid var(--secondario);
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+}
+
+#menu {
+	width: 30%;
+}
+
+#corpo {
+	width: 60%;
+}
+
+.w100 {
+	width: calc(100% - 2px);
+}
+
+.w30 {
+	width: calc( var(--larghezzaMenu) - 2px);
+}
+
+.w60 {
+	width: calc( 100% - var(--larghezzaMenu) - 2px);
+}
+
+.bRosso {
+	background-color: var(--primario);
+}
+
+.ombra {
+	box-shadow: 2px 2px 2px var(--secondario);
+}
+
+.arrotondato {
+	border-radius: var(--arrotondamento);
+}

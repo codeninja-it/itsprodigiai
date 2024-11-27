@@ -1,0 +1,27 @@
+body {
+	font-family: "Quicksand";
+	margin: 0;
+	padding: 0;
+	background-color: #CCCCCC;
+}
+
+#intestazione {
+	background-color: #FFCCCC;
+	font-family: "Sour Gummy";
+}
+
+#menu {
+	background-color: green;
+	display: inline-block;
+	width: 30%;
+}
+
+#corpo {
+	background-color: white;
+	display: inline-block;
+	width: 68%;
+}
+
+#footer {
+	
+}
