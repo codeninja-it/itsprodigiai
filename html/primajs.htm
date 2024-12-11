@@ -1,0 +1,66 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Esempio JS</title>
+	</head>
+	<body>
+		<h1 id="titolo">Esempio di JS in Pagina</h1>
+		<p id="corpo">
+			in questo esempio vediamo come inserire del codice
+			javascript direttamente nel presentation tier
+		</p>
+		<script>
+			// creare un commento
+			/*
+				commento su più righe
+			*/
+			
+			var intero = 1;
+			var decimale = 1.0;
+			var booleano = true;
+			var testo = "ciao";
+			
+			testo = testo + " mondo!";
+			
+			intero = intero + 1;
+			intero = intero + parseInt("1");
+			
+			// per parlare con il mio utente
+			// alert("Hai vinto la lotteria degli utenti!");
+			// o ricevere informazioni da lui
+			// var risultato = prompt("Per ricevere un miliardo di euro, digita il tuo iban:", "devi scriverlo qui");
+			// alert("ci sei cascato! il tuo iban è " + risultato);
+			
+			// chiedere la base
+			var base = prompt("a parte gli scherzi, che tabellina vuoi?");
+			// chiedere le ripetizioni
+			var volte = prompt("quante volte ripeto?");
+			// mi creo un contatore per ricordarmi a che punto sono
+			var punto = 1;
+			var buffer = "";
+			// e creo il ciclo
+			while(punto < volte){
+				var risultato = base * punto;
+				var testuale = base + " X " + punto + " = " + risultato;
+				buffer = buffer +  testuale + "\r\n";
+				punto = punto + 1;
+			}
+			alert(buffer);
+			
+			// var prodotto1 = [1, "Tastiera", 15, "pc", true];
+			/*
+				prodotto1	[0]	=> id
+							[1] => nome
+							[2] => prezzo
+							[3] => categoria
+							[4] => promozione
+				var catalogo = 
+							[ 
+								[1, "Tastiera", 15, "pc", true], 
+								[2, "Mouse", 5, "pc", false], 
+								[3, "XBOX S", 299, "console", true] 
+							];
+			*/
+		</script>
+	</body>
+</html>

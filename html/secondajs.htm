@@ -1,0 +1,53 @@
+<html>
+	<head>
+	</head>
+	<body>
+		<h1 id="titolo"></h1>
+		<p id="descrizione"></p>
+		<button id="pulsanteIndietro">indietro</button>
+		<button id="pulsanteAvanti">avanti</button>
+		<script>
+		
+			// avendo un archivio di dati
+			var archivio = 
+						[
+							["Tastiera Logitec", "Tastiera base QWERTY con tanto di tastierino numerico!"],
+							["Mouse generico", "mouse bluetooth a 6 pulsanti", 12],
+							["XBOX", "console di gioco con 256gb di memoria", 299],
+							["Nintend Switch", "console portatile di casa nintendo", 320]
+						];
+			
+			// innanzi tutto chiedo al sistema i riferimenti
+			var titolo = document.getElementById("titolo");
+			var descrizione = document.getElementById("descrizione");
+			var btnIndietro = document.getElementById("pulsanteIndietro");
+			var btnAvanti = document.getElementById("pulsanteAvanti");
+			
+			// per poterci lavorare sopra
+			// es.: CaricaProdotto(1) -> Mouse generico
+			function CaricaProdotto(numero){
+				var prodotto = archivio[numero];
+				titolo.innerText = prodotto[0];
+				descrizione.innerText = prodotto[1];
+			}
+			
+			var indice = 0;
+			
+			function CaricaAvanti(){
+				if (indice < archivio.length - 1) // se è minore dei prodotti
+					indice = indice + 1; // spingilo avanti
+				CaricaProdotto(indice); // e modifica la pagina
+			}
+			
+			function CaricaIndietro(){
+				if (indice > 0) // se indice è maggiore di 0
+					indice = indice - 1; // tiralo indietro
+				CaricaProdotto(indice); // e modifica la pagina
+			}
+			
+			// e connetto le mie funzioni ai trigger in pagina
+			btnIndietro.onclick = CaricaIndietro;
+			btnAvanti.onclick = CaricaAvanti;
+		</script>
+	</body>
+</html>
