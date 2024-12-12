@@ -1,0 +1,47 @@
+<html>
+	<head>
+		<title>Esempio event drive</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body>
+		<button onclick="manche(0)">sasso</button>
+		<button onclick="manche(1)">carta</button>
+		<button onclick="manche(2)">forbice</button>
+		<p align="center">
+			<span id="puntiUtente">utente</span> vs <span id="puntiPC">pc</span>
+		</p>
+		<script>
+			var punteggioUtente = 0;
+			var punteggioPc = 0;
+			var scoreUtente = document.getElementById("puntiUtente");
+			var scorePc = document.getElementById("puntiPC");
+			
+			function manche(sceltaUtente){
+				var sceltaPc = Math.trunc(Math.random() * 3);
+				if(
+						(sceltaUtente == 0 && sceltaPc == 2) ||
+						(sceltaUtente == 1 && sceltaPc == 0) ||
+						(sceltaUtente == 2 && sceltaPc == 1)
+					){
+					punteggioUtente++; //utente vince
+				} else {
+					punteggioPc++; // utente perde -> pc vince
+				}
+				if(punteggioUtente < 3 && punteggioPc < 3){ // avvertiamo l'utente
+					scoreUtente.innerText = punteggioUtente;
+					scorePc.innerText = punteggioPc;
+				} else if(punteggioUtente > punteggioPc){
+					alert("hai vinto!");
+					punteggioUtente = 0;
+					punteggioPc = 0;
+				} else {
+					alert("hai perso!");
+					punteggioUtente = 0;
+					punteggioPc = 0;
+				}
+			}
+			
+		</script>
+	</body>
+</html>

@@ -1,8 +1,11 @@
 // inizializzazione dei punteggi
-var utente = 0;
+var utente = 1000;
 var pc = 0;
 
 function start(){
+	// azzero eventuali punteggi pregressi
+	utente = 0;
+	pc = 0;
 	// ciclo del nostro gioco
 	do {
 		// la manche esegue le regole del gioco
