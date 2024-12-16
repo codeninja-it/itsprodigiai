@@ -45,18 +45,51 @@ function sottrazione(a, b){
 // "12 sommato 4".split(" ") => ["12", "sommato", "4"];
 
 var comandi = {
-	"-": sottrazione,
-	"meno": sottrazione,
-	"sottratto": sottrazione,
-	"minus": sottrazione,
-	"+": addizione,
+	"-": sottrazione,			// [12, "-", "2"]	NTN
+	"meno": sottrazione,		// 12 meno 2		NTN
+	"sottratto": sottrazione,	// 12 sottratto 2	NTN
+	"minus": sottrazione,		// 12 minus 2
+	"+": addizione,				// 12 + 2
 	"più": addizione,
 	"sommato": addizione,
 	"sum": addizione,
 	"*": moltiplicazione,
-	"moltiplicato": moltiplicazione,
-	"X": moltiplicazione,
+	"moltiplicato": moltiplicazione,	// 12 moltiplicato 2, 12 moltiplicato per 2
+	"X": moltiplicazione,				// radice di 4	TTN
+	"per": moltiplicazione,				// 2 elevato per 8	NTTN
 	":": divisione,
 	"diviso": divisione,
-	"/" : divisione
+	"/": divisione,
+	"su": divisione 
 };
+
+
+function analisiSegmenti(testo){
+	
+	var daEliminare = [
+					"il", "lo", "la", "i", "gli", "le", 
+					"di", "a", "da", "in", "con", "tra", "fra", 
+					"un", "uno", "una",
+					"del", "dei"
+					];
+					
+	for(var i=0; i < daEliminare.length; i++){
+		var vecchio = daEliminare[i];
+		testo = testo.replaceAll(vecchio, "");
+	}
+	
+	var segmenti = testo.trim().split(" ");
+	
+	var pattern = "";
+	for(var i=0; i < segmenti.length; i++){
+		var segmento = segmenti[i];
+		pattern += isNaN(segmento) ? "T" : "N";
+	}
+	return pattern;
+}
+
+
+function segnaNumero(dove, numero){
+	var campo = document.getElementById(dove);
+	campo.value += numero.toString();
+}
