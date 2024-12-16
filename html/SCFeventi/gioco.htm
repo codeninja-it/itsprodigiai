@@ -1,28 +1,41 @@
 <html>
 	<head>
-		<title>Esempio event drive</title>
+		<title>Esempio event driven</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 	</head>
 	<body>
-		<button onclick="manche(0)">sasso</button>
-		<button onclick="manche(1)">carta</button>
-		<button onclick="manche(2)">forbice</button>
-		<p align="center">
-			<span id="puntiUtente">utente</span> vs <span id="puntiPC">pc</span>
-		</p>
+		<div class="container-fluid bg-danger text-center">
+			<h1>Sasso Carta Forbice</h1>
+			<p>Usa i pulsanti per giocare!</p>
+		</div>
+		<div class="container" id="messaggi"></div>
+		<div class="container text-center">
+			<div class="btn-group">
+			<button class="btn btn-warning" onclick="manche(sasso)">sasso</button>
+			<button class="btn btn-warning" onclick="manche(carta)">carta</button>
+			<button class="btn btn-warning" onclick="manche(forbice)">forbice</button>
+			</div>
+		</div>
+		<div class="container text-center mt-3 p-3 text-white bg-secondary">
+			<span id="puntiUtente">0</span> vs <span id="puntiPC">0</span>
+		</div>
 		<script>
+			var sasso = 0, carta = 1, forbice = 2;
 			var punteggioUtente = 0;
 			var punteggioPc = 0;
 			var scoreUtente = document.getElementById("puntiUtente");
 			var scorePc = document.getElementById("puntiPC");
+			var divMessaggi = document.getElementById("messaggi"); 
 			
 			function manche(sceltaUtente){
 				var sceltaPc = Math.trunc(Math.random() * 3);
 				if(
-						(sceltaUtente == 0 && sceltaPc == 2) ||
-						(sceltaUtente == 1 && sceltaPc == 0) ||
-						(sceltaUtente == 2 && sceltaPc == 1)
+						(sceltaUtente == sasso && sceltaPc == forbice) ||
+						(sceltaUtente == carta && sceltaPc == sasso) ||
+						(sceltaUtente == forbice && sceltaPc == carta)
 					){
 					punteggioUtente++; //utente vince
 				} else {
@@ -31,13 +44,13 @@
 				if(punteggioUtente < 3 && punteggioPc < 3){ // avvertiamo l'utente
 					scoreUtente.innerText = punteggioUtente;
 					scorePc.innerText = punteggioPc;
-				} else if(punteggioUtente > punteggioPc){
-					alert("hai vinto!");
-					punteggioUtente = 0;
-					punteggioPc = 0;
 				} else {
-					alert("hai perso!");
-					punteggioUtente = 0;
+					if(punteggioUtente > punteggioPc){ // comunico il risultato
+						divMessaggi.innerHTML = "<div class='alert alert-success'>Hai vinto!</div>";
+					} else {
+						divMessaggi.innerHTML = "<div class='alert alert-danger'>Hai perso!</div>";
+					}
+					punteggioUtente = 0; // resetto la partita
 					punteggioPc = 0;
 				}
 			}
