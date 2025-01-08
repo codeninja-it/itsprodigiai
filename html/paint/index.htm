@@ -1,0 +1,142 @@
+<html>
+	<head>
+		<title>Paint!</title>
+		<meta charset="utf-8">
+		<style>
+			body {
+				background-color: grey;
+				padding: 0;
+				margin: 0;
+				font-family: monospace;
+			}
+			
+			#pulsantiera {
+			    background-color: lightgray;
+				padding: 1em;
+				margin: 0;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+			
+			#titolo {
+				font-size: x-large;
+				font-weight: bold;
+			}
+			
+			#schermo {
+				text-align: center;
+				margin-top: 1em;
+			}
+			
+			#schermo > canvas {
+				background-color: white;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="pulsantiera">
+			<span id="titolo">Paint!</span>
+			<input type="range" min="1" max="20" value="2" id="tratto" />
+			<input type="color" value="#222222" id="colore" />
+			<button onclick="alert('ciao!');">?</button>
+		</div>
+		<div id="schermo">
+			<canvas id="lavagna" 
+					width="400px" 
+					height="300px">browser troppo vecchio</canvas>
+		</div>
+		<script>
+			// dopo aver connesso il target
+			var target = document.getElementById("lavagna");
+			target.width = window.innerWidth - 100;
+			// e recuperato il disegno al suo interno
+			var disegno = target.getContext("2d");
+			// e inizializzato un contatore
+			var contatore = 0;
+			
+			// mi faccio restituire l'elemento dove l'utente seleziona il colore
+			var colore = document.getElementById("colore");
+			var tratto = document.getElementById("tratto");
+			
+			var prima;
+			var tutti = []; //[{{x: 0, y: 0}, {x: 1, y:0} ]
+			
+			// quando il mouse si sposta sopra il target (lavagna)
+			target.onmousemove = function(adesso) {
+				// incremento il contatore
+				contatore++;
+				// e scrivo a quanto stiamo
+				// console.log(contatore);
+				if(adesso.buttons == 1){
+					disegno.beginPath();
+					disegno.moveTo(prima.offsetX, prima.offsetY);
+					disegno.lineTo(adesso.offsetX, adesso.offsetY);
+					disegno.lineWidth = tratto.value;
+					disegno.strokeStyle = colore.value;
+					disegno.lineCap = "round";
+					disegno.stroke();
+					//disegno.fillRect(parametro.offsetX, parametro.offsetY, 1, 1);
+					tutti.push( { "x" : adesso.offsetX, "y" : adesso.offsetY} );
+					Arima();
+				} else {
+					tutti = [];
+				}
+				prima = adesso;
+				
+			}
+			
+			function Arima(finestra = 50){
+				var quanti = tutti.length; // 158
+				if(finestra + 1 < quanti){
+					// inizializzo due variabili
+					var p1 = {"x": 0, "y": 0};
+					var p2 = {"x": 0, "y": 0};
+
+					for(var i=1; i <= finestra; i++){
+						var indice = quanti-i;
+						// addiziono a p1 le coordinate del mouse
+						p1.x += tutti[indice].x;
+						p1.y += tutti[indice].y;
+						// e contemporaneamente addiziono a p2
+						// le coordinate precedenti
+						p2.x += tutti[indice-1].x;
+						p2.y += tutti[indice-1].y;
+					}
+					// uscito da qui dentro p1 e p2
+					// quindi calcolo i punti a media
+					p1 = {
+							"x": p1.x / finestra,
+							"y": p1.y / finestra
+						};
+					p2 = {
+							"x": p2.x / finestra,
+							"y": p2.y / finestra
+						};
+					var differenza = {
+									"x": p1.x - p2.x,
+									"y": p1.y - p2.y
+								};
+					var ultimo = tutti[tutti.length-1];
+					console.log(p1);
+					disegno.fillStyle = "red";
+					disegno.fillRect(
+										p1.x, 
+										p1.y, 
+										1, 
+										1
+									);
+					console.log(differenza);
+					disegno.fillStyle = "green";
+					disegno.fillRect(
+										ultimo.x + differenza.x, 
+										ultimo.y + differenza.y, 
+										1, 
+										1
+									);
+				}
+			}
+			
+		</script>
+	</body>
+</html>
