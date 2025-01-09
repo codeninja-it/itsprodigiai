@@ -1,0 +1,124 @@
+<html>
+	<head>
+		<title>Conway's Microscope</title>
+		<meta charset="utf-8"/>
+		<style>
+			body {
+				padding:0;
+				margin:0;
+				font-family: monospace;
+			}
+			
+			h1 {
+				background-color: lightgrey;
+			}
+			
+			#riga1, #riga2, #riga3 {
+				text-align: center;
+			}
+			
+			#riga1 > canvas {
+			    width: 500px;
+				height: 500px;
+				background-color: lightblue;
+				border-radius: 9999px;
+				box-shadow: 5px 5px 5px #80808099;
+				border: 2pt solid white;
+			}
+			
+			#riga2 {
+				margin-top: 1em;
+			}
+			
+			#riga2, #riga3 {
+				padding: 1em;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Conway's microscope</h1>
+		<p>Analizza il tuo vetrino!</p>
+		<div id="riga1">
+			<canvas id="board"></canvas>
+		</div>
+		<div id="riga2">
+			<button onclick="Turno('board', 100, 100, 'tolleranza', 5);">analizza</button>
+		</div>
+		<div id="riga3">
+			<input id="tolleranza" type="range" value="0.07" min="0.01" max="0.50" step="0.01">
+		</div>
+		<script>
+			var board = [];
+			
+			function initBoard(righe = 50, colonne = 50, tolleranza = 0.2){
+				//per ogni riga
+				for(var y=0; y<righe; y++){
+					board[y] = [];
+					// per ogni colonna
+					for(var x=0; x<colonne; x++){
+						board[y][x] = Math.random() < tolleranza ? 1 : 0;
+					}
+				}
+			}
+			
+			function updateLavagna(idTarget, righe = 50, colonne = 50, zoom = 10){
+				var lavagna = document.getElementById(idTarget);
+				lavagna.width = colonne * zoom;
+				lavagna.height = righe * zoom;
+				var disegno = lavagna.getContext("2d");
+				// per ogni riga
+				for(var y=0; y<righe; y++){
+					// per ogni colonna
+					for(var x=0; x<colonne; x++){
+						if(board[y][x] == 0){
+							// disegna morto
+							disegno.fillStyle = "#00000022";
+						} else {
+							// disegna vivo
+							disegno.fillStyle = "#00ff0055";
+						}
+						disegno.fillRect(x * zoom, y * zoom, zoom, zoom);
+					}
+				}
+			}
+			
+			function AnalizzaBoard(righe = 50, colonne = 50){
+				for(var y=0; y<righe; y++){
+					for(var x=0; x<colonne; x++){
+						// calcolo gli angoli sotrattivi
+						var T = y == 0 ? righe-1 : y-1;
+						var L = x == 0 ? colonne-1: x-1;
+						// ed additivi
+						var B = (y + 1) % righe;
+						var R = (x + 1) % colonne;
+						// con questi trovo i vicini
+						var vicini = 
+									// fila TL->TR
+									board[T][L] + board[T][x] + board[T][R] +
+									// fila attuale
+									board[y][L] + board[y][R] +
+									// fila BL -> BR
+									board[B][L] + board[B][x] +	board[B][R];
+						// quindi decido la cella
+						if(vicini < 2 || vicini > 3)
+							board[y][x] = 0;
+						else if (vicini == 3 && board[y][x] == 0)
+							board[y][x] = 1;
+					}
+				}
+			}
+			
+			function Turno(target, righe, colonne, tolleranza, zoom){
+				var tolleranza = document.getElementById(tolleranza);
+				// qui lo faccio una volta sola
+				initBoard(righe, colonne, tolleranza.value);
+				setInterval(function(){
+					// qui lo faccio una volta ogni mezzo secondo
+					AnalizzaBoard(righe, colonne);
+					updateLavagna(target, righe, colonne, zoom);
+				}, 100);
+			}
+			
+		</script>
+	</body>
+</html>
