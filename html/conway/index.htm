@@ -13,7 +13,7 @@
 				background-color: lightgrey;
 			}
 			
-			#riga1, #riga2, #riga3 {
+			#riga1, #riga2, #riga3, #riga4 {
 				text-align: center;
 			}
 			
@@ -30,8 +30,14 @@
 				margin-top: 1em;
 			}
 			
-			#riga2, #riga3 {
+			#riga2, #riga3, #riga4 {
 				padding: 1em;
+			}
+			
+			#grafico {
+				width: 50%;
+				border-radius: 1em;
+				box-shadow: 5px 5px 5px #00000033;
 			}
 		</style>
 	</head>
@@ -42,13 +48,25 @@
 			<canvas id="board"></canvas>
 		</div>
 		<div id="riga2">
-			<button onclick="Turno('board', 100, 100, 'tolleranza', 5);">analizza</button>
+			<button onclick="Turno('board', 'grafico', 100, 100, 'tolleranza', 'finestra', 5);">analizza</button>
 		</div>
 		<div id="riga3">
-			<input id="tolleranza" type="range" value="0.07" min="0.01" max="0.50" step="0.01">
+			<label for="tolleranza">
+				tolleranza
+				<input id="tolleranza" type="range" value="0.07" min="0.01" max="0.50" step="0.01">
+			</label>
+			<label for="finestra">
+				finestra
+				<input id="finestra" type="range" value="10" min="1" max="100" step="1">
+			</label>
+		</div>
+		<div id="riga4">
+			<canvas id="grafico" width="1000" height="500"></canvas>
 		</div>
 		<script>
 			var board = [];
+			var valori = [];
+			var previsioni = [];
 			
 			function initBoard(righe = 50, colonne = 50, tolleranza = 0.2){
 				//per ogni riga
@@ -83,6 +101,7 @@
 			}
 			
 			function AnalizzaBoard(righe = 50, colonne = 50){
+				var vivi = 0;
 				for(var y=0; y<righe; y++){
 					for(var x=0; x<colonne; x++){
 						// calcolo gli angoli sotrattivi
@@ -104,19 +123,103 @@
 							board[y][x] = 0;
 						else if (vicini == 3 && board[y][x] == 0)
 							board[y][x] = 1;
+						if(board[y][x] == 1)
+							vivi++;
 					}
 				}
+				var percentuale = parseInt(vivi / (righe * colonne) * 1000); // 1250 / 2500
+				valori.push(percentuale);
 			}
 			
-			function Turno(target, righe, colonne, tolleranza, zoom){
+			function Turno(target, grafico, righe, colonne, tolleranza, finestra, zoom){
+				var finestra = document.getElementById(finestra);
 				var tolleranza = document.getElementById(tolleranza);
 				// qui lo faccio una volta sola
 				initBoard(righe, colonne, tolleranza.value);
+				valori = [];
+				previsioni = [];
 				setInterval(function(){
 					// qui lo faccio una volta ogni mezzo secondo
 					AnalizzaBoard(righe, colonne);
 					updateLavagna(target, righe, colonne, zoom);
+					ARIMA(grafico, parseInt(finestra.value));
 				}, 100);
+			}
+			
+			function ARIMA(idCanvas, finestra = 10){
+				var lavagna = document.getElementById(idCanvas);
+				var disegno = lavagna.getContext("2d");
+				disegno.fillStyle = "#FFFFFF";
+				disegno.fillRect(0,0, lavagna.width, lavagna.height);
+				disegno.strokeStyle = "#000000";
+				
+				var tutti = valori.length;
+				
+				// previsioni pregresse
+				disegno.strokeStyle = "#00FF00";
+				for(var i=1; i < previsioni.length; i++){
+					var pn = previsioni[i-1];
+					var pv = previsioni[i];
+					disegno.moveTo(pv.x, pv.y);
+					disegno.lineTo(pn.x, pn.y);
+					disegno.stroke();
+					//disegno.beginPath();
+					//	disegno.arc(pf.x, pf.y, 5, 0, 2 * Math.PI);
+					//disegno.stroke();	
+				}
+							
+				
+				// dati - linea nera
+				disegno.strokeStyle = "#000000";
+				disegno.beginPath();
+				if(tutti > 2){
+					for(var x=1; x < tutti; x++){
+						var p1 = {"x": x-1, "y": lavagna.height - valori[x-1]};
+						var p2 = {"x": x, "y": lavagna.height - valori[x]};
+						disegno.moveTo(p1.x, p1.y);
+						disegno.lineTo(p2.x, p2.y);
+					}
+					disegno.stroke();
+				}
+				
+				// tendenza - linea rossa
+				disegno.beginPath();
+				if(tutti > finestra){
+					disegno.strokeStyle = "#FF0000";
+					var p1 = {"x" : 0, "y" : lavagna.height};
+					for(var x=finestra; x < tutti; x++){
+						var y = 0;
+						for(var i=0; i < finestra; i++){
+							y += valori[x - i];
+						}
+						y = parseInt(y / finestra);
+						var p2 = {"x": x, "y": lavagna.height - y};
+						disegno.moveTo(p1.x, p1.y);
+						disegno.lineTo(p2.x, p2.y);
+						p1 = p2;
+					}
+					disegno.stroke();
+				}
+				
+				// forecasting - linea grigia
+				disegno.beginPath();
+				if(tutti > finestra){
+					disegno.strokeStyle = "#CCCCCC55";
+					var ultimo = valori.length - 1;
+					var pr = {"x": ultimo, "y": lavagna.height - valori[ultimo]};
+					var media = 0;
+					for(var i=0; i < finestra; i++){
+						media += valori[ultimo - i];
+					}
+					media = lavagna.height - parseInt(media / finestra);
+					var delta = pr.y - media;
+					var pf = {"x" : pr.x + (finestra/2), "y": pr.y + delta};
+					
+					previsioni.push(pf);
+					disegno.moveTo(pr.x, pr.y);
+					disegno.lineTo(pf.x, pf.y);
+					disegno.stroke();
+				}
 			}
 			
 		</script>
