@@ -56,7 +56,7 @@ class Prodotto {
 			buffer += "<div class='card'>";
 				buffer += "<div class='card-header'>" + this.nome + "</div>";
 				buffer += "<div class='card-body'>" + this.descrizione + "</div>";
-				buffer += "<div class='card-footer'>" + this.dammiPrezzo() + "</div>";
+				buffer += "<div class='card-footer text-end'>&euro; " + this.dammiPrezzo() + "</div>";
 			buffer += "</div>";
 		buffer += "</div>";
 		return buffer;

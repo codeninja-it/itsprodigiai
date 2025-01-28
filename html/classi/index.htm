@@ -13,8 +13,14 @@
 	<body>
 		<h1>Catalogo prodotti</h1>
 		<div id="lavagna" class="container"></div>
+		<div id="pulsantiera" class="p-3">
+			<input placeholder="nome..." class="form-control" id="nome">
+			<input placeholder="descrizione..." class="form-control" id="descrizione">
+			<input placeholder="prezzo..." class="form-control" type="number" id="prezzo">
+			<button onclick="Aggiungi();">aggiungi</button>
+		</div>
 		<script>
-			var catalogo = new Categoria("catalogo 2025");
+			var catalogo = new Categoria("catalogo 2025", "lavagna");
 			
 			catalogo.aggiungiProdotto( new Prodotto("mouse", "senza fili", 8) );
 			catalogo.aggiungiProdotto( new Prodotto("tastiera", "microsoft", 300) );
@@ -29,9 +35,16 @@
 				paccoNatale.addComponente(catalogo.prodotti[2]);
 				paccoNatale.addComponente(kit);
 			catalogo.aggiungiProdotto(paccoNatale);
-		
-			var target = document.getElementById("lavagna");
-			target.innerHTML = catalogo.toHTML();
+			
+			function Aggiungi(){
+				catalogo.aggiungiProdotto(
+					new Prodotto(
+						document.getElementById("nome").value,
+						document.getElementById("descrizione").value,
+						parseFloat(document.getElementById("prezzo").value)
+					)
+				);
+			}
 		</script>
 	</body>
 </html>

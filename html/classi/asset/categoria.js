@@ -1,6 +1,7 @@
 class Categoria{
-	constructor(Nome){
+	constructor(Nome, idTarget){
 		this.nome = Nome;
+		this.target = document.getElementById(idTarget);
 		this.prodotti = [];
 	}
 	
@@ -9,6 +10,7 @@ class Categoria{
 			prodotto.aggiungiCategoria(this);
 			this.prodotti.push(prodotto);
 		}
+		this.target.innerHTML = this.toHTML();
 	}
 	
 	applicaSconto(sconto = 20){
