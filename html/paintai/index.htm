@@ -1,0 +1,114 @@
+<html>
+	<head>
+		<title>Paint!</title>
+		<meta charset="utf-8">
+		<script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+		<style>
+			body {
+				background-color: grey;
+				padding: 0;
+				margin: 0;
+				font-family: monospace;
+			}
+			
+			#pulsantiera {
+			    background-color: lightgray;
+				padding: 1em;
+				margin: 0;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+			
+			#titolo {
+				font-size: x-large;
+				font-weight: bold;
+			}
+			
+			#schermo {
+				text-align: center;
+				margin-top: 1em;
+			}
+			
+			#schermo > canvas {
+				background-color: white;
+			}
+			
+			#grafico {
+				width: 50%;
+				border-radius: 1em;
+				box-shadow: 5px 5px 5px #00000033;
+			}
+			
+			#messaggi {
+				width: 50%;
+				border-radius: 1em;
+				margin: 1em;
+				background-color: white;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="pulsantiera">
+			<span id="titolo">Paint AI!</span>
+			<input type="range" min="1" max="20" value="2" id="tratto" />
+			<input type="color" value="#222222" id="colore" />
+			<button onclick="valuta();">cos'è?</button>
+		</div>
+		<div id="schermo">
+			<canvas id="lavagna" 
+					width="400px" 
+					height="300px">browser troppo vecchio</canvas>
+		</div>
+		<div id="messaggi"></div>
+		<script>
+			// dopo aver connesso il target
+			var target = document.getElementById("lavagna");
+			target.width = window.innerWidth - 100;
+			// e recuperato il disegno al suo interno
+			var disegno = target.getContext("2d");
+			
+			var messaggi = document.getElementById("messaggi");
+			
+			// classificatore
+			const cnn = ml5.imageClassifier("MobileNet", caricato);
+			
+			// mi faccio restituire l'elemento dove l'utente seleziona il colore
+			var colore = document.getElementById("colore");
+			var tratto = document.getElementById("tratto");
+			
+			var prima;
+			var tutti = []; //[{{x: 0, y: 0}, {x: 1, y:0} ]
+			
+			// quando il mouse si sposta sopra il target (lavagna)
+			target.onmousemove = function(adesso) {
+				if(adesso.buttons == 1){
+					disegno.beginPath();
+					disegno.moveTo(prima.offsetX, prima.offsetY);
+					disegno.lineTo(adesso.offsetX, adesso.offsetY);
+					disegno.lineWidth = tratto.value;
+					disegno.strokeStyle = colore.value;
+					disegno.lineCap = "round";
+					disegno.stroke();
+					//disegno.fillRect(parametro.offsetX, parametro.offsetY, 1, 1);
+					tutti.push( { "x" : adesso.offsetX, "y" : adesso.offsetY} );
+				} else {
+					tutti = [];
+				}
+				prima = adesso;
+			}
+			
+			function caricato(){
+				messaggi.innerHTML = "modello caricato!";
+			}
+			
+			function valuta(){
+				cnn.classify(target, (risultati) => {
+				  console.log(risultati);
+				  messaggi.innerHTML = "secondo me è " + risultati[0].label;
+			  });
+			}			
+			
+		</script>
+	</body>
+</html>
