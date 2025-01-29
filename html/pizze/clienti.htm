@@ -1,0 +1,84 @@
+<html>
+	<head>
+		<title>Clienti</title>
+		<meta charset="utf-8"/>
+		<script>
+			class Cliente {
+				constructor(nome, indirizzo, telefono, id = 0){
+					this.id = id;
+					this.nome = nome;
+					this.indirizzo = indirizzo;
+					this.telefono = telefono;
+				}
+				
+				toHTML(){
+					return "<tr>" +
+								"<td>" + this.nome + "</td>" +
+								"<td>" + this.indirizzo + "</td>" +
+								"<td>" + this.telefono + "</td>" +
+							"</tr>";
+				}
+			}
+			
+			class Rubrica {					// Create Read Update Delete
+				constructor(){
+					this.contatti = [];
+					this.lastIndex = 0;
+				}
+				
+				add(contatto){ // CREATE
+					if(this.contatti.indexOf(contatto) == -1){
+						this.lastIndex++;
+						contatto.id = this.lastIndex;
+						this.contatti.push(contatto);
+					}
+					return this;
+				}
+				
+				modify(nuovo){ // UPDATE
+					for(var i =0; i < this.contatti.length; i++){
+						if(this.contatti[i].id == nuovo.id){
+							this.contatti[i] = nuovo;
+						}
+					}
+					return this;
+				}
+				
+				remove(id){ // DELETE
+					var nuovaLista = [];
+					for(var i=0; i < this.contatti.length; i++){
+						if(this.contatti[i].id != id){
+							nuovaLista.push( this.contatti[i] );
+						}
+					}
+					this.contatti = nuovaLista;
+					return this;
+				}
+				
+				toHTML(){ // READ
+					var buffer = "<table>";
+					for(var i=0; i < this.contatti.length; i++){
+						buffer += this.contatti[i].toHTML();
+					}
+					buffer += "</table>";
+					return buffer;
+				}
+			}
+			
+			var rubrica = new Rubrica();
+			rubrica
+				.add( new Cliente("Jhon Doe", "Via Giotto", "000001")) // 1
+				.add( new Cliente("Jhon Doe", "Piazza Veneto", "000004")) // 2
+				.add( new Cliente("Mario Rossi", "Via Giotto", "000002")) // 3
+				.add( new Cliente("Giuseppe Verdi", "Piazza Veneto", "0000003")) // 4
+				.modify(new Cliente("Jhon Doe", "P.za Veneto", "000004", 2))
+				.remove(4)
+				.add( new Cliente("Giuseppe Verdi", "Piazza Veneto", "0000003")) // 5;
+		</script>
+	</head>
+	<body>
+		<h1>Clienti</h1>
+		<p>Usa questa pagina per gestire i tuoi clienti!</p>
+		<div id="target"></div>
+	</body>
+</html>
