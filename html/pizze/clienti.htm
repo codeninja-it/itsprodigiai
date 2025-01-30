@@ -17,6 +17,8 @@
 								"<td>" + this.nome + "</td>" +
 								"<td>" + this.indirizzo + "</td>" +
 								"<td>" + this.telefono + "</td>" +
+								"<td><button onclick='Sostituisci(" + this.id + ");'>sostituisci</button></td>" + 
+								"<td><button onclick='Cancella(" + this.id + ");'>cancella</button></td>" +
 							"</tr>";
 				}
 			}
@@ -26,6 +28,31 @@
 					this.nome = nome;
 					this.righe = [];
 					this.lastIndex = 0;
+				}
+				
+				save(){
+					localStorage.setItem(
+										this.nome,
+										JSON.stringify(this.righe)
+										);
+				}
+				
+				load(){
+					var buffer = localStorage.getItem(this.nome);
+					if(buffer != null){
+						var grezzi = JSON.parse(buffer);
+						for(var i=0; i < grezzi.length; i++){
+							this.add( 
+										new Cliente(
+											grezzi[i].nome,
+											grezzi[i].indirizzo,
+											grezzi[i].telefono,
+											grezzi[i].id
+											)									
+									);
+						}
+					}
+					return this;
 				}
 				
 				add(riga){ // CREATE
@@ -75,6 +102,13 @@
 					for(var i=0; i < this.righe.length; i++){
 						buffer += this.righe[i].toHTML();
 					}
+					buffer += "<tr>" +
+								"<td></td>" +
+								"<td><input id='newNome' /></td>" +
+								"<td><input id='newIndirizzo' /></td>" +
+								"<td><input id='newTelefono' /></td>" +
+								"<td><button onclick='Aggiungi();'>aggiungi</button></td>" +
+								"</tr>";
 					buffer += "</table>";
 					return buffer;
 				}
@@ -88,22 +122,59 @@
 		<script>
 			var rubrica = new Tabella("rubrica clienti");
 			var target = document.getElementById("target");
+			
 			target.innerHTML = rubrica
-				.add( new Cliente("Jhon Doe", "Via Giotto", "000001")) // 1
-				.add( new Cliente("Jhon Doe", "Piazza Veneto", "000004")) // 2
-				.add( new Cliente("Mario Rossi", "Via Giotto", "000002")) // 3
-				.add( new Cliente("Giuseppe Verdi", "Piazza Veneto", "0000003")) // 4
-				.modify(new Cliente("Jhon Doe", "P.za Veneto", "000004", 2))
-				.remove( function(x){ 
-							return x.nome=="Jhon Doe"; 
-							} 
-						)
-				.add( new Cliente("Giuseppe Verdi", "Piazza Veneto", "0000003"))
-				.toHTML(); // 5
+									.load()
+									.toHTML();
+				//.add( new Cliente("Jhon Doe", "Via Giotto", "000001")) // 1
+				//.add( new Cliente("Jhon Doe", "Piazza Veneto", "000004")) // 2
+				//.add( new Cliente("Mario Rossi", "Via Giotto", "000002")) // 3
+				//.add( new Cliente("Giuseppe Verdi", "Piazza Veneto", "0000003")) // 4
+				//.modify(new Cliente("Jhon Doe", "P.za Veneto", "000004", 2))
+				//.remove( function(x){ 
+				//			return x.nome=="Jhon Doe"; 
+				//			} 
+				//		)
+				//.add( new Cliente("Giuseppe Verdi", "Piazza Veneto", "0000003"))
+				//.toHTML(); // 5
 				
-			target.innerHTML = rubrica
-								.where(function(x) { return x.indirizzo == "Via Giotto" })
-								.toHTML();
+				//target.innerHTML = rubrica
+				//					.where(function(x) { return x.indirizzo == "Via Giotto" })
+				//					.toHTML();
+			
+			function Cancella(daCancellare){
+				target.innerHTML = rubrica
+									.remove( function(x) { 
+												return daCancellare == x.id ; 
+												} 
+											)
+									.toHTML();
+			}
+			
+			function Aggiungi(){
+				target.innerHTML = rubrica
+									.add(
+										new Cliente(
+											document.getElementById("newNome").value,
+											document.getElementById("newIndirizzo").value,
+											document.getElementById("newTelefono").value
+										)
+									)
+									.toHTML();
+			}
+			
+			function Sostituisci(chi){
+				target.innerHTML = rubrica
+									.modify(
+										new Cliente(
+											document.getElementById("newNome").value,
+											document.getElementById("newIndirizzo").value,
+											document.getElementById("newTelefono").value,
+											chi
+										)
+									)
+									.toHTML();
+			}
 		</script>
 	</body>
 </html>
