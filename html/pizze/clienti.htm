@@ -13,6 +13,7 @@
 				
 				toHTML(){
 					return "<tr>" +
+								"<td>" + this.id + "</td>" +
 								"<td>" + this.nome + "</td>" +
 								"<td>" + this.indirizzo + "</td>" +
 								"<td>" + this.telefono + "</td>" +
@@ -20,65 +21,89 @@
 				}
 			}
 			
-			class Rubrica {					// Create Read Update Delete
-				constructor(){
-					this.contatti = [];
+			class Tabella {					// Create Read Update Delete
+				constructor(nome){
+					this.nome = nome;
+					this.righe = [];
 					this.lastIndex = 0;
 				}
 				
-				add(contatto){ // CREATE
-					if(this.contatti.indexOf(contatto) == -1){
+				add(riga){ // CREATE
+					if(this.righe.indexOf(riga) == -1){
 						this.lastIndex++;
-						contatto.id = this.lastIndex;
-						this.contatti.push(contatto);
+						riga.id = this.lastIndex;
+						this.righe.push(riga);
 					}
 					return this;
 				}
 				
 				modify(nuovo){ // UPDATE
-					for(var i =0; i < this.contatti.length; i++){
-						if(this.contatti[i].id == nuovo.id){
-							this.contatti[i] = nuovo;
+					for(var i =0; i < this.righe.length; i++){
+						if(this.righe[i].id == nuovo.id){
+							this.righe[i] = nuovo;
 						}
 					}
 					return this;
 				}
 				
-				remove(id){ // DELETE
-					var nuovaLista = [];
-					for(var i=0; i < this.contatti.length; i++){
-						if(this.contatti[i].id != id){
-							nuovaLista.push( this.contatti[i] );
+				where( condizione ){ // FILTER
+					var selezionati = [];
+					for(var i=0; i < this.righe.length; i++){
+						if( condizione(  this.righe[i] ) ){
+							selezionati.push( this.righe[i] );
 						}
 					}
-					this.contatti = nuovaLista;
+					var nuova = new Tabella(this.nome);
+					nuova.righe = selezionati;
+					nuova.lastIndex = this.lastIndex;
+					return nuova;
+				}
+				
+				remove( condizione ){ // DELETE
+					var nuovaLista = [];
+					for(var i=0; i < this.righe.length; i++){
+						if( !condizione(  this.righe[i] ) ){
+							nuovaLista.push( this.righe[i] );
+						}
+					}
+					this.righe = nuovaLista;
 					return this;
 				}
 				
 				toHTML(){ // READ
-					var buffer = "<table>";
-					for(var i=0; i < this.contatti.length; i++){
-						buffer += this.contatti[i].toHTML();
+					var buffer = "<h2>" + this.nome + "</h2><table>";
+					for(var i=0; i < this.righe.length; i++){
+						buffer += this.righe[i].toHTML();
 					}
 					buffer += "</table>";
 					return buffer;
 				}
 			}
-			
-			var rubrica = new Rubrica();
-			rubrica
-				.add( new Cliente("Jhon Doe", "Via Giotto", "000001")) // 1
-				.add( new Cliente("Jhon Doe", "Piazza Veneto", "000004")) // 2
-				.add( new Cliente("Mario Rossi", "Via Giotto", "000002")) // 3
-				.add( new Cliente("Giuseppe Verdi", "Piazza Veneto", "0000003")) // 4
-				.modify(new Cliente("Jhon Doe", "P.za Veneto", "000004", 2))
-				.remove(4)
-				.add( new Cliente("Giuseppe Verdi", "Piazza Veneto", "0000003")) // 5;
 		</script>
 	</head>
 	<body>
 		<h1>Clienti</h1>
 		<p>Usa questa pagina per gestire i tuoi clienti!</p>
 		<div id="target"></div>
+		<script>
+			var rubrica = new Tabella("rubrica clienti");
+			var target = document.getElementById("target");
+			target.innerHTML = rubrica
+				.add( new Cliente("Jhon Doe", "Via Giotto", "000001")) // 1
+				.add( new Cliente("Jhon Doe", "Piazza Veneto", "000004")) // 2
+				.add( new Cliente("Mario Rossi", "Via Giotto", "000002")) // 3
+				.add( new Cliente("Giuseppe Verdi", "Piazza Veneto", "0000003")) // 4
+				.modify(new Cliente("Jhon Doe", "P.za Veneto", "000004", 2))
+				.remove( function(x){ 
+							return x.nome=="Jhon Doe"; 
+							} 
+						)
+				.add( new Cliente("Giuseppe Verdi", "Piazza Veneto", "0000003"))
+				.toHTML(); // 5
+				
+			target.innerHTML = rubrica
+								.where(function(x) { return x.indirizzo == "Via Giotto" })
+								.toHTML();
+		</script>
 	</body>
 </html>
