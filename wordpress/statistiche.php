@@ -20,6 +20,7 @@
 				"supports"	=> array("title", "excerpt")
 			)
 		);
+		
 	}
 	
 	add_action("init", "inizializza");
@@ -40,3 +41,22 @@
 	}
 	
 	add_shortcode("statistica", "registraStatistica");
+	
+	
+	add_action("add_meta_boxes", "attivaBox");
+	function attivaBox(){
+		add_meta_box(
+						"boxStatistica", 
+						"Come utilizzarlo", 
+						"datiStatistica",
+						null,
+						"side"
+					);
+	}
+	
+	function datiStatistica(){
+		echo "Per utilizzarlo incolla in pagina il seguente testo:";
+		echo "<b>[statistica id=".$_GET["post"]."]</b>";
+	}
+	
+	
