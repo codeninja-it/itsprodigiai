@@ -32,11 +32,16 @@
 			// recupero il suo id per poterlo usare
 			$idPost = $attributi["id"];
 			// con questo trovo quante visite sono già state registrate
-			$visitePerAdesso = intval( get_post_meta($idPost, "visite", true) );
+			$visitePerAdesso = intval( get_post_meta($idPost, "visite", true) );  // "12" => 12, "ciao" => 0 
 			// incremento della visita attuale, perchè php viene lanciato ogni volta
 			$visitePerAdesso++;
 			// aggiorno in banca dati al nuovo valore
 			update_post_meta($idPost, "visite", $visitePerAdesso);
+			
+			// e salvo anche la data e l'ora attuale
+			$dataAttuale = date("Y-m-d H:i:s")
+			update_post_meta($idPost, "ultimaVisita", $dataAttuale );
+			return $visitePerAdesso."<br>".$data;
 		}
 	}
 	
