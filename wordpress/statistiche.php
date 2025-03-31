@@ -55,16 +55,13 @@
 		add_meta_box( "boxModificaVisite", "Visitatori totali", "moduloVisitatori" );
 	}
 	
-	function datiStatistica(){
+	function datiStatistica($post){
 		echo "Per utilizzarlo incolla in pagina il seguente testo:";
-		echo "<b>[statistica id=".$_GET["post"]."]</b>";
+		echo "<b>[statistica id=".$post->ID."]</b>";
 	}
 	
-	function moduloVisitatori(){
-		echo "<p>GET: ".json_encode($_GET)."</p>";
-		echo "<p>POST: ".json_encode($_POST)."</p>";
-		$idPost = intval($_GET["post"]);
-		$visite = get_post_meta($idPost, "visite", true);
+	function moduloVisitatori($post){
+		$visite = get_post_meta($post->ID, "visite", true);
 		echo "<p>
 					<label for='nvisite'>Visite</label>
 					<input type='number' value='".$visite."' name='nvisite' id='nvisite'>
@@ -73,7 +70,7 @@
 	
 	add_action("save_post_statistica", "salvaStatistica");
 	
-	function salvaStatistica(){
+	function salvaStatistica($post_id){
 		// costruisco un array con dentro sia get che post
 		$stato = array(
 					"get" => $_GET,
@@ -82,9 +79,50 @@
 		// lo convert in json
 		$buffer = json_encode($stato, JSON_PRETTY_PRINT);
 		// lo salvo su disco per vedere cosa vede il mio server
-		// quando gli chiedo di salvare un post
+		// quando gli chiedo di salvare un post ( __FILE__ )
 		file_put_contents(__DIR__ . "/registro_statistiche.json", $buffer);
 		
-		update_post_meta( $_POST["ID"], "visite", $_POST["nvisite"]);
+		$visite = isset($_POST["nvisite"]) ? $_POST["nvisite"] : 0;
+		 
+		update_post_meta($post_id, "visite", $visite);
 	}
 	
+	add_action("rest_api_init", "init_rest");
+	
+	function init_rest(){
+		// registro un endpoint che risponderà abs
+		// http://127.0.0.1/wordpress/wp-json/statistiche/tutte/
+		register_rest_route(
+			"statistiche",	// radice dell'endpoint, ovvero lo spazio dei nomi
+			"tutte",		// nome dell'endpoint
+			array(
+				"methods"	=> "GET",			// metodo HTTP che innescherà l'endpoint
+				"callback"	=> "esporta_json"	// funzione che verrà attivata	
+			)
+		);
+	}
+	
+	function esporta_json(){
+		$buffer = [];
+		
+		// recuperare tutti i post di tipo statistica
+		$tutti = get_posts(
+					array(
+						"post_type" => "statistica"
+					)
+				);
+		// per ognuno di essi
+		foreach($tutti as $singolo){
+			// aggiungere un elemento al nostro array
+			$buffer[] = array(
+							"id" 			=> $singolo->ID,
+							"titolo"		=> $singolo->post_title,
+							"autore"		=> $singolo->post_author,
+							"descrizione"	=> $singolo->post_excerpt,
+							"creazione"		=> $singolo->post_date,
+							"visite"		=> get_post_meta( $singolo->ID, "visite", true )
+						);
+		}
+		
+		return $buffer;
+	}
