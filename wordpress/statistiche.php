@@ -41,7 +41,7 @@
 			// e salvo anche la data e l'ora attuale
 			$dataAttuale = date("Y-m-d H:i:s");
 			update_post_meta($idPost, "ultimaVisita", $dataAttuale );
-			return $visitePerAdesso."<br>".$data;
+			return $visitePerAdesso."<br>".$dataAttuale;
 		}
 	}
 	
