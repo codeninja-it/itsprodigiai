@@ -1,3 +1,11 @@
+import os
+
+def clear():
+    if os.name == "nt":
+        os.system("cls")
+    else:
+        os.system("clear")
+
 def somma(a, b):
     c = a + b
     return str(a) + " + " + str(b) + " = " + str(c)
@@ -40,7 +48,7 @@ while continua:
         
     # interagisci
     if operazione != None:
-        clear
+        clear()
         print("Base:\t", end="")
         base = int( input() )
         print("Ripetizioni:\t", end="")
